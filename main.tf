@@ -11,7 +11,7 @@ resource "aws_instance" "this" {
   ami                    = "${var.ami}"
   instance_type          = "${var.instance_type}"
   user_data              = "${var.user_data}"
-  subnet_id              = "${var.subnet_id}"
+  subnet_id              = "${element(distinct(compact(concat(list(var.subnet_id), var.subnet_ids))),count.index)}"
   key_name               = "${var.key_name}"
   monitoring             = "${var.monitoring}"
   vpc_security_group_ids = ["${var.vpc_security_group_ids}"]
@@ -34,7 +34,7 @@ resource "aws_instance" "this" {
   placement_group                      = "${var.placement_group}"
   tenancy                              = "${var.tenancy}"
 
-  tags = "${merge(var.tags, map("Name", var.instance_count > 1 ? format("%s-%d", var.name, count.index+1) : var.name))}"
+  tags = "${merge(map("Name", (var.instance_count > 1) || (var.use_num_suffix == "true") ? format("%s-%d", var.name, count.index+1) : var.name), var.tags)}"
 
   lifecycle {
     # Due to several known issues in Terraform AWS provider related to arguments of aws_instance:
@@ -50,7 +50,7 @@ resource "aws_instance" "this_t2" {
   ami                    = "${var.ami}"
   instance_type          = "${var.instance_type}"
   user_data              = "${var.user_data}"
-  subnet_id              = "${var.subnet_id}"
+  subnet_id              = "${element(distinct(compact(concat(list(var.subnet_id), var.subnet_ids))),count.index)}"
   key_name               = "${var.key_name}"
   monitoring             = "${var.monitoring}"
   vpc_security_group_ids = ["${var.vpc_security_group_ids}"]
@@ -77,7 +77,7 @@ resource "aws_instance" "this_t2" {
     cpu_credits = "${var.cpu_credits}"
   }
 
-  tags = "${merge(var.tags, map("Name", var.instance_count > 1 ? format("%s-%d", var.name, count.index+1) : var.name))}"
+  tags = "${merge(map("Name", (var.instance_count > 1) || (var.use_num_suffix == "true") ? format("%s-%d", var.name, count.index+1) : var.name), var.tags)}"
 
   lifecycle {
     # Due to several known issues in Terraform AWS provider related to arguments of aws_instance:

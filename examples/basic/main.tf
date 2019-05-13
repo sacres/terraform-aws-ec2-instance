@@ -16,6 +16,8 @@ data "aws_subnet_ids" "all" {
 data "aws_ami" "amazon_linux" {
   most_recent = true
 
+  owners = ["amazon"]
+
   filter {
     name = "name"
 
@@ -34,8 +36,8 @@ data "aws_ami" "amazon_linux" {
 }
 
 module "security_group" {
-  source      = "terraform-aws-modules/security-group/aws"
-  version     = "2.7.0"
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "2.7.0"
 
   name        = "example"
   description = "Security group for example usage with EC2 instance"
@@ -62,6 +64,11 @@ module "ec2" {
   subnet_id                   = "${element(data.aws_subnet_ids.all.ids, 0)}"
   vpc_security_group_ids      = ["${module.security_group.this_security_group_id}"]
   associate_public_ip_address = true
+
+  root_block_device = [{
+    volume_type = "gp2"
+    volume_size = 10
+  }]
 }
 
 module "ec2_with_t2_unlimited" {

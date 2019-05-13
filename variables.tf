@@ -57,6 +57,13 @@ variable "vpc_security_group_ids" {
 
 variable "subnet_id" {
   description = "The VPC Subnet ID to launch in"
+  default     = ""
+}
+
+variable "subnet_ids" {
+  description = "A list of VPC Subnet IDs to launch in"
+  default     = []
+  type        = "list"
 }
 
 variable "associate_public_ip_address" {
@@ -127,4 +134,9 @@ variable "network_interface" {
 variable "cpu_credits" {
   description = "The credit option for CPU usage (unlimited or standard)"
   default     = "standard"
+}
+
+variable "use_num_suffix" {
+  description = "Always append numerical suffix to instance name, even if instance_count is 1"
+  default     = "false"
 }
